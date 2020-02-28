@@ -1,0 +1,24 @@
+// Powered by Infostretch 
+
+timestamps {
+
+node () {
+
+	stage ('item_free_configuration - Checkout') {
+ 	 checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'c778b0de-4289-4520-aea3-f101162149ce', url: 'https://github.com/almwf/test-repo']]]) 
+	}
+	stage ('item_free_configuration - Build') {
+ 			// Maven build step
+	withMaven(maven: 'm3') { 
+ 			if(isUnix()) {
+ 				sh "mvn package " 
+			} else { 
+ 				bat "mvn package " 
+			} 
+ 		} 
+	}
+	stage ('deploy') {
+	deploy adapters: [tomcat8(credentialsId: 'ee2f3524-10b2-4ca9-9908-6e4f9a4e8658', path: '', url: 'http://192.168.56.106:8080')], contextPath: null, war: '**/*.war'
+	}
+}
+}
